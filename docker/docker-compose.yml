@@ -10,8 +10,8 @@ services:
     ports:
       - '8000:80'
     volumes:
-      - ./www:/var/www
-      - ./nginx/default.conf:/etc/nginx/config.d/default.conf
+      - ../www:/var/www
+      - ../nginx/default.conf:/etc/nginx/config.d/default.conf
     depends_on:
       - php
       - mysql
@@ -41,7 +41,7 @@ services:
       dockerfile: ../php/Dockerfile
     container_name: php
     volumes:
-      - ./www:/var/www
+      - ../www:/var/www
     ports:
       - '9000:9000'
     networks:
