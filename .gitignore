@@ -1,6 +1,8 @@
 .env
 .idea
 /.project
+/data
+/logs
 
 /logstash/pipeline/*.conf
 /logstash/config/pipelines.yml

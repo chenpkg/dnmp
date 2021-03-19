@@ -8,6 +8,8 @@ FROM php:${LARADOCK_PHP_VERSION}-fpm
 
 LABEL maintainer="Cestbon <734245503@qq.com>"
 
+ARG LARADOCK_PHP_VERSION
+
 # Set Environment Variables
 ENV DEBIAN_FRONTEND noninteractive
 
