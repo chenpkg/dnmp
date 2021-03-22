@@ -57,6 +57,7 @@ RUN set -xe; \
     usermod -p "*" laradock -s /bin/bash && \
     apt-get install -yqq \
       apt-utils \
+      supervisor \
       #
       #--------------------------------------------------------------------------
       # Mandatory Software's Installation
@@ -425,3 +426,7 @@ RUN apt-get clean && \
 
 # Set default work directory
 WORKDIR /var/www
+
+COPY supervisord.conf /etc/supervisord.conf
+
+ENTRYPOINT ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]

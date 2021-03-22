@@ -48,7 +48,7 @@ services:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
       - ./workspace/crontab/laradock:/etc/cron.d/laradock
       #- docker-in-docker:/certs/client
-      #- ./php-worker/supervisord.d:/etc/supervisord.d
+      - ./workspace/supervisord.d:/etc/supervisord.d
     extra_hosts:
       - "dockerhost:${DOCKER_HOST_IP}"
     ports:
@@ -81,7 +81,8 @@ services:
     environment:
       - TZ=${WORKSPACE_TIMEZONE}
     depends_on:
-      - php-fpm
+      - php-worker
+      - php73
     networks:
       - frontend
       - backend
@@ -118,56 +119,125 @@ services:
     networks:
       - backend
 
-  php-fpm:
+#  php-fpm:
+#    build:
+#      context: ./php-fpm
+#      args:
+#        - CHANGE_SOURCE=${CHANGE_SOURCE}
+#        - BASE_IMAGE_TAG_PREFIX=${PHP_FPM_BASE_IMAGE_TAG_PREFIX}
+#        - LARADOCK_PHP_VERSION=${PHP_VERSION}
+#        - LARADOCK_PHALCON_VERSION=${PHALCON_VERSION}
+#        - INSTALL_BZ2=${PHP_FPM_INSTALL_BZ2}
+#        - INSTALL_GMP=${PHP_FPM_INSTALL_GMP}
+#        - INSTALL_MONGO=${PHP_FPM_INSTALL_MONGO}
+#        - INSTALL_PHPREDIS=${PHP_FPM_INSTALL_PHPREDIS}
+#        - INSTALL_SWOOLE=${PHP_FPM_INSTALL_SWOOLE}
+#        - INSTALL_MEMCACHED=${PHP_FPM_INSTALL_MEMCACHED}
+#        - INSTALL_SOAP=${PHP_FPM_INSTALL_SOAP}
+#        - INSTALL_OPCACHE=${PHP_FPM_INSTALL_OPCACHE}
+#        - INSTALL_EXIF=${PHP_FPM_INSTALL_EXIF}
+#        - INSTALL_MYSQLI=${PHP_FPM_INSTALL_MYSQLI}
+#        - INSTALL_IMAGEMAGICK=${PHP_FPM_INSTALL_IMAGEMAGICK}
+#        - INSTALL_FAKETIME=${PHP_FPM_INSTALL_FAKETIME}
+#        - INSTALL_IONCUBE=${PHP_FPM_INSTALL_IONCUBE}
+#        - INSTALL_YAML=${PHP_FPM_INSTALL_YAML}
+#        - INSTALL_MYSQL_CLIENT=${PHP_FPM_INSTALL_MYSQL_CLIENT}
+#        #- INSTALL_WKHTMLTOPDF=${PHP_FPM_INSTALL_WKHTMLTOPDF}
+#        - DOWNGRADE_OPENSSL_TLS_AND_SECLEVEL=${PHP_DOWNGRADE_OPENSSL_TLS_AND_SECLEVEL}
+#        - PUID=${PHP_FPM_PUID}
+#        - PGID=${PHP_FPM_PGID}
+#        - IMAGEMAGICK_VERSION=${PHP_FPM_IMAGEMAGICK_VERSION}
+#        - INSTALL_DOCKER_CLIENT=${PHP_FPM_INSTALL_DOCKER_CLIENT}
+#        - http_proxy
+#        - https_proxy
+#        - no_proxy
+#    volumes:
+#      - ./php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
+#      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+##    ports:
+##      - "9003:9003"
+#    expose:
+#      - "9000"
+#    extra_hosts:
+#      - "dockerhost:${DOCKER_HOST_IP}"
+#    environment:
+##      - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
+##      - DOCKER_HOST=tcp://docker-in-docker:2376
+#      - DOCKER_TLS_VERIFY=1
+#      - DOCKER_TLS_CERTDIR=/certs
+#      - DOCKER_CERT_PATH=/certs/client
+##      - FAKETIME=${PHP_FPM_FAKETIME}
+#    depends_on:
+#      - workspace
+#    networks:
+#      - backend
+
+  php-worker:
     build:
-      context: ./php-fpm
+      context: ./php-worker
       args:
         - CHANGE_SOURCE=${CHANGE_SOURCE}
-        - BASE_IMAGE_TAG_PREFIX=${PHP_FPM_BASE_IMAGE_TAG_PREFIX}
         - LARADOCK_PHP_VERSION=${PHP_VERSION}
-        - LARADOCK_PHALCON_VERSION=${PHALCON_VERSION}
+        - PHALCON_VERSION=${PHALCON_VERSION}
         - INSTALL_BZ2=${PHP_FPM_INSTALL_BZ2}
-        - INSTALL_MONGO=${PHP_FPM_INSTALL_MONGO}
-        - INSTALL_PHPREDIS=${PHP_FPM_INSTALL_PHPREDIS}
-        - INSTALL_SWOOLE=${PHP_FPM_INSTALL_SWOOLE}
-        - INSTALL_MEMCACHED=${PHP_FPM_INSTALL_MEMCACHED}
-        - INSTALL_OPCACHE=${PHP_FPM_INSTALL_OPCACHE}
-        - INSTALL_EXIF=${PHP_FPM_INSTALL_EXIF}
-        - INSTALL_MYSQLI=${PHP_FPM_INSTALL_MYSQLI}
+        - INSTALL_GD=${PHP_FPM_INSTALL_GD}
+        - INSTALL_GMP=${PHP_FPM_INSTALL_GMP}
         - INSTALL_IMAGEMAGICK=${PHP_FPM_INSTALL_IMAGEMAGICK}
-        - INSTALL_FAKETIME=${PHP_FPM_INSTALL_FAKETIME}
-        - INSTALL_IONCUBE=${PHP_FPM_INSTALL_IONCUBE}
-        - INSTALL_YAML=${PHP_FPM_INSTALL_YAML}
+        - INSTALL_PGSQL=${PHP_FPM_INSTALL_PGSQL}
+        - INSTALL_SOAP=${PHP_FPM_INSTALL_SOAP}
+        - INSTALL_ZIP_ARCHIVE=${PHP_FPM_INSTALL_ZIP_ARCHIVE}
         - INSTALL_MYSQL_CLIENT=${PHP_FPM_INSTALL_MYSQL_CLIENT}
-        #- INSTALL_WKHTMLTOPDF=${PHP_FPM_INSTALL_WKHTMLTOPDF}
-        - DOWNGRADE_OPENSSL_TLS_AND_SECLEVEL=${PHP_DOWNGRADE_OPENSSL_TLS_AND_SECLEVEL}
+        - INSTALL_SWOOLE=${PHP_FPM_INSTALL_SWOOLE}
+        - INSTALL_REDIS=${PHP_FPM_INSTALL_PHPREDIS}
         - PUID=${PHP_FPM_PUID}
         - PGID=${PHP_FPM_PGID}
         - IMAGEMAGICK_VERSION=${PHP_FPM_IMAGEMAGICK_VERSION}
-        - INSTALL_DOCKER_CLIENT=${PHP_FPM_INSTALL_DOCKER_CLIENT}
-        - http_proxy
-        - https_proxy
-        - no_proxy
     volumes:
-      - ./php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
-    ports:
-      - "9003:9003"
+      - ./php-worker/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
+#    ports:
+#      - "9003:9003"
     expose:
       - "9000"
-    extra_hosts:
-      - "dockerhost:${DOCKER_HOST_IP}"
-    environment:
-#      - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
-#      - DOCKER_HOST=tcp://docker-in-docker:2376
-      - DOCKER_TLS_VERIFY=1
-      - DOCKER_TLS_CERTDIR=/certs
-      - DOCKER_CERT_PATH=/certs/client
-#      - FAKETIME=${PHP_FPM_FAKETIME}
     depends_on:
       - workspace
+    extra_hosts:
+      - "dockerhost:${DOCKER_HOST_IP}"
     networks:
       - backend
+
+  php73:
+    build:
+      context: ./php-worker
+      args:
+        - CHANGE_SOURCE=${CHANGE_SOURCE}
+        - LARADOCK_PHP_VERSION=7.3
+        - PHALCON_VERSION=${PHALCON_VERSION}
+        - INSTALL_BZ2=${PHP_FPM_INSTALL_BZ2}
+        - INSTALL_GD=${PHP_FPM_INSTALL_GD}
+        - INSTALL_GMP=${PHP_FPM_INSTALL_GMP}
+        - INSTALL_IMAGEMAGICK=${PHP_FPM_INSTALL_IMAGEMAGICK}
+        - INSTALL_PGSQL=${PHP_FPM_INSTALL_PGSQL}
+        - INSTALL_SOAP=${PHP_FPM_INSTALL_SOAP}
+        - INSTALL_ZIP_ARCHIVE=${PHP_FPM_INSTALL_ZIP_ARCHIVE}
+        - INSTALL_MYSQL_CLIENT=${PHP_FPM_INSTALL_MYSQL_CLIENT}
+        - INSTALL_SWOOLE=${PHP_FPM_INSTALL_SWOOLE}
+        - INSTALL_REDIS=${PHP_FPM_INSTALL_PHPREDIS}
+        - PUID=${PHP_FPM_PUID}
+        - PGID=${PHP_FPM_PGID}
+        - IMAGEMAGICK_VERSION=${PHP_FPM_IMAGEMAGICK_VERSION}
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+      - ./php-worker/php7.3.ini:/usr/local/etc/php/php.ini
+    expose:
+      - "9000"
+    depends_on:
+      - workspace
+    extra_hosts:
+      - "dockerhost:${DOCKER_HOST_IP}"
+    networks:
+      - backend
+
 
   ### ElasticSearch ########################################
   elasticsearch:
@@ -194,7 +264,7 @@ services:
       - "${ELASTICSEARCH_HOST_HTTP_PORT}:9200"
       - "${ELASTICSEARCH_HOST_TRANSPORT_PORT}:9300"
     depends_on:
-      - php-fpm
+      - php-worker
     networks:
       - frontend
       - backend
