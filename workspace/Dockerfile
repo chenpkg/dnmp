@@ -167,11 +167,11 @@ RUN echo "" >> ~/.bashrc && \
 # Crontab
 ###########################################################################
 
-USER root
-
-COPY ./crontab /etc/cron.d
-
-RUN chmod -R 644 /etc/cron.d
+#USER root
+#
+#COPY ./crontab /etc/cron.d
+#
+#RUN chmod -R 644 /etc/cron.d
 
 ###########################################################################
 # Update Repositories
