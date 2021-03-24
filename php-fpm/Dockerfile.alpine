@@ -50,8 +50,8 @@ ENV PUID ${PUID}
 ARG PGID=1000
 ENV PGID ${PGID}
 
-RUN addgroup -g ${PGID} laradock && \
-    adduser -D -G laradock -u ${PUID} laradock
+#RUN addgroup -g ${PGID} laradock && \
+#    adduser -D -G laradock -u ${PUID} laradock
 
 #Install BZ2:
 ARG INSTALL_BZ2=false
@@ -178,6 +178,21 @@ RUN if [ ${INSTALL_SWOOLE} = true ]; then \
 ;fi
 
 ###########################################################################
+# IonCube Loader:
+###########################################################################
+
+ARG INSTALL_IONCUBE=false
+
+RUN if [ ${INSTALL_IONCUBE} = true ]; then \
+    # Install the php ioncube loader
+    curl -L -o /tmp/ioncube_loaders_lin_x86-64.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
+    && tar zxpf /tmp/ioncube_loaders_lin_x86-64.tar.gz -C /tmp \
+    && mv /tmp/ioncube/ioncube_loader_lin_${LARADOCK_PHP_VERSION}.so $(php -r "echo ini_get('extension_dir');")/ioncube_loader.so \
+    && printf "zend_extension=ioncube_loader.so\n" > $PHP_INI_DIR/conf.d/0ioncube.ini \
+    && rm -rf /tmp/ioncube* \
+;fi
+
+###########################################################################
 # Taint EXTENSION
 ###########################################################################
 
@@ -200,11 +215,6 @@ RUN if [ ${INSTALL_SWOOLE} = true ]; then \
 # Make sure you rebuild your container with every change.
 #
 
-#COPY supervisord.conf /etc/supervisord.conf
-
-#ENTRYPOINT ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
-
-#RUN /usr/bin/supervisord
 
 #
 #--------------------------------------------------------------------------
@@ -229,13 +239,13 @@ RUN php -v | head -n 1 | grep -q "PHP ${PHP_VERSION}."
 #--------------------------------------------------------------------------
 #
 
+#COPY ./laravel.ini /usr/local/etc/php/conf.d
+#COPY ./xlaravel.pool.conf /usr/local/etc/php-fpm.d/
+RUN sed -i 's/\/proc\/self\/fd\/2/\/proc\/1\/fd\/2/g' /usr/local/etc/php-fpm.d/docker.conf
+
 # Clean up
 RUN rm /var/cache/apk/* \
-    && mkdir -p /var/www
+#    && mkdir -p /var/www
+     && chown -R www-data:www-data /var/www
 
-#WORKDIR /etc/supervisor/conf.d/
 WORKDIR /var/www
-
-#EXPOSE 9000
-#
-#CMD ["php-fpm7"]
