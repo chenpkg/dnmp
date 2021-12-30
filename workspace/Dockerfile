@@ -69,7 +69,7 @@ RUN set -xe; \
       # next lines are here because there is no auto build on dockerhub see https://github.com/laradock/laradock/pull/1903#issuecomment-463142846
       libzip-dev zip unzip \
       # Install the zip extension
-      php${LARADOCK_PHP_VERSION}-zip \
+      #php${LARADOCK_PHP_VERSION}-zip \
       # nasm
       nasm && \
       php -m | grep -q 'zip'
