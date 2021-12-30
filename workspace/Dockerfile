@@ -49,7 +49,6 @@ RUN if [ ${CHANGE_SOURCE} = true ]; then \
 
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
-    find /etc/apt/sources.list.d/ -type f -name "ondrej-ubuntu-php-bionic.list" -exec sed -i.bak -r 's#deb(-src)?\s*http(s)?://ppa.launchpad.net#deb\1 https\2://launchpad.proxy.ustclug.org#ig' {} \; && \
     apt-get update -yqq && \
     pecl channel-update pecl.php.net && \
     groupadd -g ${PGID} laradock && \
@@ -57,7 +56,6 @@ RUN set -xe; \
     usermod -p "*" laradock -s /bin/bash && \
     apt-get install -yqq \
       apt-utils \
-      supervisor \
       #
       #--------------------------------------------------------------------------
       # Mandatory Software's Installation
@@ -427,6 +425,6 @@ RUN apt-get clean && \
 # Set default work directory
 WORKDIR /var/www
 
-COPY ./supervisord.conf /etc/supervisord.conf
+#COPY ./supervisord.conf /etc/supervisord.conf
 
-ENTRYPOINT ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
+#ENTRYPOINT ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
